@@ -39,6 +39,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     _cameraController = CameraController(
       widget.camera,
       ResolutionPreset.low,
+      enableAudio: false,
     );
     _initializeControllerFuture = _cameraController.initialize();
   }
@@ -63,37 +64,34 @@ class TakePictureScreenState extends State<TakePictureScreen> {
           }
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-          ImageCache().clear();
-          try {
-            await _initializeControllerFuture;
-            await _cameraController.setFlashMode(FlashMode.torch);
-            await _cameraController.startVideoRecording();
-            int _start = 25;
-            Timer.periodic(
-              const Duration(seconds: 1),
-              (Timer timer) {
-                if (_start == 0) {
-                  setState(() {
-                    timer.cancel();
-                  });
-                } else {
-                  setState(() {
-                    _start--;
-                  });
-                }
-              },
-            );
-            XFile video = await _cameraController.stopVideoRecording();
-            await _cameraController.setFlashMode(FlashMode.off);
-            calculateParamters(video);
-          } catch (e) {
-            print(e);
-          }
-        },
-        label: const Text("Take Reading"),
-        icon: const Icon(Icons.camera_alt),
+      floatingActionButton: Visibility(
+        visible: !_cameraController.value.isRecordingVideo,
+        child: FloatingActionButton.extended(
+          onPressed: () async {
+            ImageCache().clear();
+            try {
+              await _initializeControllerFuture;
+              _cameraController.setFlashMode(FlashMode.torch).then(
+                (value) {
+                  _cameraController.startVideoRecording().then(
+                    (value) async {
+                      Future.delayed(const Duration(seconds: 10), () async {
+                        XFile video =
+                            await _cameraController.stopVideoRecording();
+                        _cameraController.setFlashMode(FlashMode.off);
+                        calculateParamters(video);
+                      });
+                    },
+                  );
+                },
+              );
+            } on CameraException catch (e) {
+              print(e);
+            }
+          },
+          label: const Text("Take Reading"),
+          icon: const Icon(Icons.camera_alt),
+        ),
       ),
     );
   }
@@ -101,10 +99,10 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   void calculateParamters(XFile xFile) {
     List<int> redValues = [];
     List<int> blueValues = [];
-    ExportVideoFrame.exportImage(xFile.path, 600, 1).then(
-      (images) {
+    ExportVideoFrame.exportImage(xFile.path, 200, 1).then(
+      (images) async {
         for (var image in images) {
-          final Uint8List inputImg = image.readAsBytesSync();
+          final Uint8List inputImg = await image.readAsBytes();
           final decoder = JpegDecoder();
           final decodedImg = decoder.decodeImage(inputImg);
           final decodedBytes = decodedImg?.getBytes(format: Format.rgb);
