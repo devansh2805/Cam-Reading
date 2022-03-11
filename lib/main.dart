@@ -68,26 +68,24 @@ class TakePictureScreenState extends State<TakePictureScreen> {
         onPressed: () async {
           ImageCache().clear();
           try {
-            for (var i = 0; i < 60; i++) {
-              await _initializeControllerFuture;
-              await _cameraController.setFlashMode(FlashMode.always);
-              await _cameraController.startVideoRecording();
-              int _start = 25;
-              Timer.periodic(
-                const Duration(seconds: 1),
-                (Timer timer) {
-                  if (_start == 0) {
-                    setState(() {
-                      timer.cancel();
-                    });
-                  } else {
-                    setState(() {
-                      _start--;
-                    });
-                  }
-                },
-              );
-            }
+            await _initializeControllerFuture;
+            await _cameraController.setFlashMode(FlashMode.always);
+            await _cameraController.startVideoRecording();
+            int _start = 25;
+            Timer.periodic(
+              const Duration(seconds: 1),
+              (Timer timer) {
+                if (_start == 0) {
+                  setState(() {
+                    timer.cancel();
+                  });
+                } else {
+                  setState(() {
+                    _start--;
+                  });
+                }
+              },
+            );
             XFile video = await _cameraController.stopVideoRecording();
             await _cameraController.setFlashMode(FlashMode.off);
           } catch (e) {
