@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:export_video_frame/export_video_frame.dart';
-import 'package:image/image.dart';
+import 'package:image/image.dart' as Img;
 import 'package:stats/stats.dart';
 
 Future<void> main() async {
@@ -32,6 +32,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   late CameraController _cameraController;
   late Future<void> _initializeControllerFuture;
   num _spo2 = 0;
+  bool _recordingOn = false;
 
   @override
   void initState() {
@@ -65,7 +66,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
         },
       ),
       floatingActionButton: Visibility(
-        visible: !_cameraController.value.isRecordingVideo,
+        visible: !_recordingOn,
         child: FloatingActionButton.extended(
           onPressed: () async {
             ImageCache().clear();
@@ -75,12 +76,25 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                 (value) {
                   _cameraController.startVideoRecording().then(
                     (value) async {
-                      Future.delayed(const Duration(seconds: 10), () async {
-                        XFile video =
-                            await _cameraController.stopVideoRecording();
-                        _cameraController.setFlashMode(FlashMode.off);
-                        calculateParamters(video);
+                      setState(() {
+                        _recordingOn = true;
                       });
+                      Future.delayed(
+                        const Duration(
+                          seconds: 10,
+                        ),
+                        () async {
+                          _cameraController.stopVideoRecording().then(
+                            (value) {
+                              _cameraController.setFlashMode(FlashMode.off);
+                              setState(() {
+                                _recordingOn = false;
+                              });
+                              calculateParamters(value);
+                            },
+                          );
+                        },
+                      );
                     },
                   );
                 },
@@ -102,10 +116,11 @@ class TakePictureScreenState extends State<TakePictureScreen> {
     ExportVideoFrame.exportImage(xFile.path, 200, 1).then(
       (images) async {
         for (var image in images) {
+          print(image.path);
           final Uint8List inputImg = await image.readAsBytes();
-          final decoder = JpegDecoder();
+          final decoder = Img.PngDecoder();
           final decodedImg = decoder.decodeImage(inputImg);
-          final decodedBytes = decodedImg?.getBytes(format: Format.rgb);
+          final decodedBytes = decodedImg?.getBytes(format: Img.Format.rgb);
           for (int y = 0; y < decodedImg!.height; y++) {
             for (int x = 0; x < decodedImg.width; x++) {
               redValues.add(decodedBytes![y * decodedImg.width * 3 + x * 3]);
@@ -113,9 +128,9 @@ class TakePictureScreenState extends State<TakePictureScreen> {
                   .add(decodedBytes[y * decodedImg.width * 3 + x * 3 + 2]);
             }
           }
-          calculatOxygen(redValues, blueValues);
-          print(_spo2);
         }
+        calculatOxygen(redValues, blueValues);
+        print(_spo2);
       },
     );
   }
