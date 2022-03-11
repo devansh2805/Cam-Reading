@@ -32,14 +32,13 @@ class TakePictureScreenState extends State<TakePictureScreen> {
   late CameraController _cameraController;
   late Future<void> _initializeControllerFuture;
   num _spo2 = 0;
-  num _heart_rate = 0;
 
   @override
   void initState() {
     super.initState();
     _cameraController = CameraController(
       widget.camera,
-      ResolutionPreset.high,
+      ResolutionPreset.low,
     );
     _initializeControllerFuture = _cameraController.initialize();
   }
@@ -69,7 +68,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
           ImageCache().clear();
           try {
             await _initializeControllerFuture;
-            await _cameraController.setFlashMode(FlashMode.always);
+            await _cameraController.setFlashMode(FlashMode.torch);
             await _cameraController.startVideoRecording();
             int _start = 25;
             Timer.periodic(
@@ -88,6 +87,7 @@ class TakePictureScreenState extends State<TakePictureScreen> {
             );
             XFile video = await _cameraController.stopVideoRecording();
             await _cameraController.setFlashMode(FlashMode.off);
+            calculateParamters(video);
           } catch (e) {
             print(e);
           }
