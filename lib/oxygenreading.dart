@@ -189,28 +189,48 @@ class OxygenReadingDeviceState extends State<OxygenReadingDevice> {
                 // Navigate Back with Data
                 return Text(snapshot.data.toString());
               } else {
-                return Center(
-                  child: Column(
-                    children: const [
-                      CircularProgressIndicator(),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      Text(
-                        'Reading Spo2...Keep Index Finger on Device',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 24,
+                return Scaffold(
+                  body: Center(
+                    child: Column(
+                      children: const [
+                        CircularProgressIndicator(),
+                        SizedBox(
+                          height: 20,
                         ),
-                      )
-                    ],
+                        Text(
+                          'Reading Spo2...Keep Index Finger on Device',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 24,
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 );
               }
             },
           );
         } else {
-          return const CircularProgressIndicator();
+          return Scaffold(
+            body: Center(
+              child: Column(
+                children: const [
+                  CircularProgressIndicator(),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'Connecting to HealthConnect Device',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 24,
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
         }
       },
     );
