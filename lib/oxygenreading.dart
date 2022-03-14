@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:camera/camera.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:export_video_frame/export_video_frame.dart';
 import 'package:image/image.dart' as img;
@@ -131,7 +130,6 @@ class OxygenReadingState extends State<OxygenReading> {
     ExportVideoFrame.exportImage(xFile.path, 400, 1).then(
       (images) async {
         for (var image in images) {
-          print(image.path);
           final Uint8List inputImg = await image.readAsBytes();
           final decoder = img.PngDecoder();
           final decodedImg = decoder.decodeImage(inputImg);
