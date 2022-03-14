@@ -1,15 +1,15 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
-class OxygenMeasuringWidget extends StatefulWidget {
-  const OxygenMeasuringWidget({Key? key}) : super(key: key);
-
+class WaitMeasuringWidget extends StatefulWidget {
+  const WaitMeasuringWidget({Key? key, required this.nameString})
+      : super(key: key);
+  final String nameString;
   @override
-  State<StatefulWidget> createState() => OxygenMeasuringWidgetState();
+  State<StatefulWidget> createState() => WaitMeasuringWidgetState();
 }
 
-class OxygenMeasuringWidgetState extends State<OxygenMeasuringWidget> {
+class WaitMeasuringWidgetState extends State<WaitMeasuringWidget> {
   @override
   Widget build(BuildContext context) {
     return BackdropFilter(
@@ -28,11 +28,19 @@ class OxygenMeasuringWidgetState extends State<OxygenMeasuringWidget> {
         child: SizedBox(
           height: MediaQuery.of(context).size.height * 0.30,
           width: MediaQuery.of(context).size.width - 10,
-          child: Row(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              CircularProgressIndicator(),
-              Text("Measuring SpO2........")
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(
+                height: 10,
+              ),
+              Text(
+                'Measuring ' + widget.nameString + ' ........',
+                style: const TextStyle(
+                  color: Colors.black,
+                ),
+              )
             ],
           ),
         ),

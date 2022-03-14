@@ -40,6 +40,9 @@ dependencies:
   export_video_frame:
   image:
   stats:
+  charts_flutter:
+  flutter_bluetooth_serial:
+  wakelock:
 
 dev_dependencies:
   flutter_test:
