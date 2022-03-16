@@ -36,23 +36,25 @@ class Communication {
 
   Future<bool> _connectToRpiDevice() async {
     // Check if it is Already Bonded
+
     await flutterBluetoothSerial.getBondedDevices().then((devices) async {
       for (BluetoothDevice device in devices) {
         if (device.name == "healthconnectdevice") {
           if (device.isConnected) {
+            await BluetoothConnection.toAddress(device.address)
+                .then((connection) {
+              bluetoothConnection = connection;
+            });
             return true;
           } else {
             await _connectToAddress(device.address).then((value) {
-              if (!device.isConnected) {
-                return _connectToRpiDevice();
-              } else {
-                return true;
-              }
+              return true;
             });
           }
         }
       }
     });
+    /*
     Stream<BluetoothDiscoveryResult> bluetoothDiscoveryResult =
         flutterBluetoothSerial.startDiscovery();
     bluetoothDiscoveryResult.forEach((element) async {
@@ -69,11 +71,7 @@ class Communication {
             if (bondValue != null) {
               if (bondValue) {
                 await _connectToAddress(element.device.address).then((value) {
-                  if (!element.device.isConnected) {
-                    return _connectToRpiDevice();
-                  } else {
-                    return true;
-                  }
+                  return true;
                 });
               } else {
                 return _connectToRpiDevice();
@@ -82,33 +80,32 @@ class Communication {
           });
         } else {
           await _connectToAddress(element.device.address).then((value) {
-            if (!element.device.isConnected) {
-              return _connectToRpiDevice();
-            } else {
-              return true;
-            }
+            return true;
           });
         }
       }
-    });
-    return _connectToRpiDevice();
+    }); */
+    return false;
   }
 
   Future<void> _connectToAddress(address) async {
     await BluetoothConnection.toAddress(address).then((connection) {
       bluetoothConnection = connection;
     }).catchError((error) {
+      print(error);
       print('Cannot Connect to HealthConnect Device');
     });
   }
 
   Future<String> readMessage() async {
     String result = "";
-    await Future.delayed(const Duration(seconds: 30), () {
+    await Future.delayed(const Duration(seconds: 70), () {
       try {
         bluetoothConnection.input?.listen((data) {
           result = ascii.decode(data);
+          print(result);
         }).onDone(() {});
+        return result;
       } catch (error) {
         print(error);
       }

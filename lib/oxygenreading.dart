@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:ui';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:export_video_frame/export_video_frame.dart';
@@ -172,65 +173,133 @@ class OxygenReadingDevice extends StatefulWidget {
 class OxygenReadingDeviceState extends State<OxygenReadingDevice> {
   Communication communication = Communication();
   String reading = "";
+  //late Future<bool> connectionState;
+
+  @override
+  void initState() {
+    super.initState();
+    //connectionState = communication.initialize();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: communication.initialize(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.done) {
-          communication.sendMessage("Read SpO2");
-          return FutureBuilder(
-            future: communication.readMessage(),
-            builder: (context, messagesnapshot) {
-              if (messagesnapshot.connectionState == ConnectionState.done) {
-                // Navigate Back with Data
-                return Text(snapshot.data.toString());
-              } else {
-                return Scaffold(
-                  body: Center(
-                    child: Column(
-                      children: const [
-                        CircularProgressIndicator(),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Text(
-                          'Reading Spo2...Keep Index Finger on Device',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 24,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Oxygen Reading"),
+      ),
+      body: Center(
+          child: TextButton(
+        child: const Text("Start Reading"),
+        onPressed: () async {
+          await communication.initialize();
+          if (communication.bluetoothConnection.isConnected) {
+            await communication.sendMessage("Oxygen");
+            // Show Some Temporary Screen Instructing User to use sensor
+            await communication.readMessage().then((value) {
+              print(value);
+              Navigator.pop(context);
+            });
+          } else {
+            showDialog(
+              context: context,
+              useRootNavigator: false,
+              builder: (context) {
+                return BackdropFilter(
+                  filter: ImageFilter.blur(
+                    sigmaX: 10.0,
+                    sigmaY: 10.0,
+                  ),
+                  child: Dialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        20,
+                      ),
+                    ),
+                    elevation: 5,
+                    backgroundColor: Colors.indigo[50],
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.30,
+                      width: MediaQuery.of(context).size.width - 10,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text("Error Connecting Device"),
+                          const SizedBox(
+                            height: 10,
                           ),
-                        )
-                      ],
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text("Retry"),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );
-              }
-            },
-          );
-        } else {
-          return Scaffold(
-            body: Center(
-              child: Column(
-                children: const [
-                  CircularProgressIndicator(),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Text(
-                    'Connecting to HealthConnect Device',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 24,
-                    ),
-                  )
-                ],
-              ),
-            ),
-          );
-        }
-      },
+              },
+            );
+          }
+        },
+      )),
     );
+    //   return FutureBuilder(
+    //     future: communication.initialize(),
+    //     builder: (context, snapshot) {
+    //       if (snapshot.connectionState == ConnectionState.done) {
+    //         communication.sendMessage("Read SpO2");
+    //         return FutureBuilder(
+    //           future: communication.readMessage(),
+    //           builder: (context, messagesnapshot) {
+    //             if (messagesnapshot.connectionState == ConnectionState.done) {
+    //               // Navigate Back with Data
+    //               return Text(snapshot.data.toString());
+    //             } else {
+    //               return Scaffold(
+    //                 body: Center(
+    //                   child: Column(
+    //                     children: const [
+    //                       CircularProgressIndicator(),
+    //                       SizedBox(
+    //                         height: 20,
+    //                       ),
+    //                       Text(
+    //                         'Reading Spo2...Keep Index Finger on Device',
+    //                         style: TextStyle(
+    //                           color: Colors.black,
+    //                           fontSize: 24,
+    //                         ),
+    //                       )
+    //                     ],
+    //                   ),
+    //                 ),
+    //               );
+    //             }
+    //           },
+    //         );
+    //       } else {
+    //         return Scaffold(
+    //           body: Center(
+    //             child: Column(
+    //               children: const [
+    //                 CircularProgressIndicator(),
+    //                 SizedBox(
+    //                   height: 20,
+    //                 ),
+    //                 Text(
+    //                   'Connecting to HealthConnect Device',
+    //                   style: TextStyle(
+    //                     color: Colors.black,
+    //                     fontSize: 24,
+    //                   ),
+    //                 )
+    //               ],
+    //             ),
+    //           ),
+    //         );
+    //       }
+    //     },
+    //   );
   }
 }

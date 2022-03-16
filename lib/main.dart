@@ -63,6 +63,7 @@ class ReaderState extends State<Reader> {
                             children: [
                               const Text('Do you have Health Connect Device?'),
                               Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   TextButton(
                                     onPressed: () {
