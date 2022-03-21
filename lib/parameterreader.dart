@@ -57,11 +57,11 @@ class ParameterReaderState extends State<ParameterReader> {
               child: TextButton(
                 child: const Text("Start Reading"),
                 onPressed: () async {
-                  setState(() {
-                    _loading = true;
-                  });
                   await widget.communication.initialize();
                   if (widget.communication.connectionState) {
+                    setState(() {
+                      _loading = true;
+                    });
                     await widget.communication
                         .sendMessage(widget.bluetoothMessage);
                     // Show Some Temporary Screen Instructing User to use sensor
