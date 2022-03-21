@@ -129,7 +129,8 @@ class _HeartRateCalculatorState extends State<HeartRateCalculator> {
   }
 
   void onClickSave() {
-    Navigator.pop(context, bpm.round());
+    Navigator.of(context, rootNavigator: true)
+        .pop(bpm.round().toString() + " bpm");
   }
 
   void onCalculateBPM() {
@@ -202,7 +203,7 @@ class _HeartRateCalculatorState extends State<HeartRateCalculator> {
                           ),
                           onPressed: () {
                             if (_start != 'Start') {
-                              // onClickSave();
+                              onClickSave();
                             }
                           },
                           child: const Text("Save")),

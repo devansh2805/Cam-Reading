@@ -44,10 +44,44 @@ class ParameterReaderState extends State<ParameterReader> {
           if (widget.communication.bluetoothConnection.isConnected) {
             await widget.communication.sendMessage(widget.bluetoothMessage);
             // Show Some Temporary Screen Instructing User to use sensor
-            Future.delayed(Duration(seconds: widget.sensorWaitingTime), () async {
+            Future.delayed(Duration(seconds: widget.sensorWaitingTime),
+                () async {
               await widget.communication.readMessage().then((value) {
                 print(value);
-                Navigator.pop(context);
+                switch (widget.bluetoothMessage) {
+                  case "Oxygen":
+                    {
+                      Navigator.pop(
+                        context,
+                        value.toString() + " %",
+                      );
+                      break;
+                    }
+                  case "Heart Rate":
+                    {
+                      Navigator.pop(
+                        context,
+                        value.toString() + " bpm",
+                      );
+                      break;
+                    }
+                  case "Temperature":
+                    {
+                      Navigator.pop(
+                        context,
+                        value.toString() + " °F",
+                      );
+                      break;
+                    }
+                  case "Blood Pressure":
+                    {
+                      Navigator.pop(
+                        context,
+                        value.toString(),
+                      );
+                      break;
+                    }
+                }
               });
             });
           } else {

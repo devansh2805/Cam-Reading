@@ -41,50 +41,19 @@ class Communication {
       for (BluetoothDevice device in devices) {
         if (device.name == "healthconnectdevice") {
           if (device.isConnected) {
-            await BluetoothConnection.toAddress(device.address)
-                .then((connection) {
-              bluetoothConnection = connection;
-            });
             return true;
           } else {
             await _connectToAddress(device.address).then((value) {
-              return true;
+              if (device.isConnected) {
+                return true;
+              } else {
+                return false;
+              }
             });
           }
         }
       }
     });
-    /*
-    Stream<BluetoothDiscoveryResult> bluetoothDiscoveryResult =
-        flutterBluetoothSerial.startDiscovery();
-    bluetoothDiscoveryResult.forEach((element) async {
-      if (element.device.name == "healthconnectdevice") {
-        if (element.device.isConnected) {
-          Future.delayed(const Duration(milliseconds: 10), () {
-            return true;
-          });
-        }
-        if (!element.device.isBonded) {
-          flutterBluetoothSerial
-              .bondDeviceAtAddress(element.device.address)
-              .then((bondValue) async {
-            if (bondValue != null) {
-              if (bondValue) {
-                await _connectToAddress(element.device.address).then((value) {
-                  return true;
-                });
-              } else {
-                return _connectToRpiDevice();
-              }
-            }
-          });
-        } else {
-          await _connectToAddress(element.device.address).then((value) {
-            return true;
-          });
-        }
-      }
-    }); */
     return false;
   }
 
@@ -99,15 +68,15 @@ class Communication {
 
   Future<String> readMessage() async {
     String result = "";
-      try {
-        bluetoothConnection.input?.listen((data) {
-          result = ascii.decode(data);
-        });
-        return result;
-      } catch (error) {
-        print(error);
-      }
+    try {
+      bluetoothConnection.input?.listen((data) {
+        result = ascii.decode(data);
+      });
       return result;
+    } catch (error) {
+      print(error);
+    }
+    return result;
   }
 
   Future<void> sendMessage(String text) async {

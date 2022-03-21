@@ -153,16 +153,6 @@ class OxygenReadingState extends State<OxygenReading> {
                       setState(() {
                         _recordingOn = true;
                       });
-                      // BuildContext dialogContext = context;
-                      /*showDialog(
-                        context: context,
-                        builder: (context) {
-                          dialogContext = context;
-                          return const WaitMeasuringWidget(
-                            nameString: 'SpO2',
-                          );
-                        },
-                      );*/
                       Future.delayed(
                         const Duration(
                           seconds: 20,
@@ -175,11 +165,14 @@ class OxygenReadingState extends State<OxygenReading> {
                                     .setFlashMode(FlashMode.off)
                                     .then((value) {
                                   setState(() {
-                                    // Navigator.pop(dialogContext);
                                     _recordingOn = false;
                                   });
                                 });
                               });
+                              Navigator.pop(
+                                context,
+                                _spo2.round().toString() + " %",
+                              );
                             },
                           );
                         },

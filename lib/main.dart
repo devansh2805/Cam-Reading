@@ -30,6 +30,8 @@ class Reader extends StatefulWidget {
 
 class ReaderState extends State<Reader> {
   Communication communication = Communication();
+  String result = "";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,6 +43,10 @@ class ReaderState extends State<Reader> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Text("Last Reading: $result"),
+            const SizedBox(
+              height: 10,
+            ),
             TextButton(
               onPressed: () {
                 showDialog(
@@ -88,7 +94,11 @@ class ReaderState extends State<Reader> {
                                               sensorWaitingTime: 65,
                                             );
                                           }),
-                                        );
+                                        ).then((value) {
+                                          setState(() {
+                                            result = value;
+                                          });
+                                        });
                                       },
                                       child: const Text('Yes'),
                                     ),
@@ -104,7 +114,11 @@ class ReaderState extends State<Reader> {
                                               camera: widget.camera,
                                             ),
                                           ),
-                                        );
+                                        ).then((value) {
+                                          setState(() {
+                                            result = value;
+                                          });
+                                        });
                                       },
                                       child: const Text("No"),
                                     ),
@@ -173,7 +187,11 @@ class ReaderState extends State<Reader> {
                                               sensorWaitingTime: 65,
                                             );
                                           }),
-                                        );
+                                        ).then((value) {
+                                          setState(() {
+                                            result = value;
+                                          });
+                                        });
                                       },
                                       child: const Text('Yes'),
                                     ),
@@ -190,7 +208,11 @@ class ReaderState extends State<Reader> {
                                               camera: widget.camera,
                                             ),
                                           ),
-                                        );
+                                        ).then((value) {
+                                          setState(() {
+                                            result = value;
+                                          });
+                                        });
                                       },
                                       child: const Text("No"),
                                     ),
@@ -224,7 +246,9 @@ class ReaderState extends State<Reader> {
                       sensorWaitingTime: 125,
                     );
                   }),
-                );
+                ).then((value) {
+                  result = value;
+                });
               },
               child: const Text(
                 "Read Temperature",
@@ -245,7 +269,9 @@ class ReaderState extends State<Reader> {
                       sensorWaitingTime: 30,
                     );
                   }),
-                );
+                ).then((value) {
+                  result = value;
+                });
               },
               child: const Text(
                 "Read Blood Pressure",
