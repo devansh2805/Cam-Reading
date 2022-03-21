@@ -6,9 +6,11 @@ import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 class Communication {
   late FlutterBluetoothSerial flutterBluetoothSerial =
       FlutterBluetoothSerial.instance;
-  late BluetoothConnection bluetoothConnection;
+  BluetoothConnection? bluetoothConnection;
+  bool connectionState = false;
 
   Future<bool> initialize() async {
+    connectionState = false;
     return await _askforEnablingBluetooth();
   }
 
@@ -41,13 +43,15 @@ class Communication {
       for (BluetoothDevice device in devices) {
         if (device.name == "healthconnectdevice") {
           if (device.isConnected) {
+            connectionState = device.isConnected;
             return true;
           } else {
             await _connectToAddress(device.address).then((value) {
               if (device.isConnected) {
+                connectionState = device.isConnected;
                 return true;
               } else {
-                return false;
+                return _connectToRpiDevice();
               }
             });
           }
@@ -66,10 +70,10 @@ class Communication {
     });
   }
 
-  Future<String> readMessage() async {
+  String readMessage() {
     String result = "";
     try {
-      bluetoothConnection.input?.listen((data) {
+      bluetoothConnection?.input?.listen((data) {
         result = ascii.decode(data);
       });
       return result;
@@ -81,8 +85,8 @@ class Communication {
 
   Future<void> sendMessage(String text) async {
     try {
-      bluetoothConnection.output.add(Uint8List.fromList(utf8.encode(text)));
-      await bluetoothConnection.output.allSent;
+      bluetoothConnection?.output.add(Uint8List.fromList(utf8.encode(text)));
+      await bluetoothConnection?.output.allSent;
     } catch (error) {
       print("Error Sending Data");
     }

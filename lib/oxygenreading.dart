@@ -167,12 +167,12 @@ class OxygenReadingState extends State<OxygenReading> {
                                   setState(() {
                                     _recordingOn = false;
                                   });
+                                  Navigator.pop(
+                                    context,
+                                    _spo2.round().toString() + " %",
+                                  );
                                 });
                               });
-                              Navigator.pop(
-                                context,
-                                _spo2.round().toString() + " %",
-                              );
                             },
                           );
                         },

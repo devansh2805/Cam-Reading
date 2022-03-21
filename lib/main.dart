@@ -65,66 +65,70 @@ class ReaderState extends State<Reader> {
                         ),
                         elevation: 5,
                         backgroundColor: Colors.indigo[50],
-                        child: SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.30,
-                          width: MediaQuery.of(context).size.width - 10,
-                          child: Center(
-                            child: Column(
-                              children: [
-                                const Text(
-                                  'Do you have Health Connect Device?',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
+                        child: Center(
+                          child: SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.30,
+                            width: MediaQuery.of(context).size.width - 10,
+                            child: Center(
+                              child: Column(
+                                children: [
+                                  const Text(
+                                    'Do you have Health Connect Device?',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(builder: (context) {
-                                            return ParameterReader(
-                                              communication: communication,
-                                              bluetoothMessage: "Oxygen",
-                                              title: "Oxygen Reading",
-                                              sensorWaitingTime: 65,
-                                            );
-                                          }),
-                                        ).then((value) {
-                                          setState(() {
-                                            result = value;
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) {
+                                              return ParameterReader(
+                                                communication: communication,
+                                                bluetoothMessage: "Oxygen",
+                                                title: "Oxygen Reading",
+                                                sensorWaitingTime: 75,
+                                              );
+                                            }),
+                                          ).then((value) {
+                                            setState(() {
+                                              result = value;
+                                            });
                                           });
-                                        });
-                                      },
-                                      child: const Text('Yes'),
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => OxygenReading(
-                                              camera: widget.camera,
+                                        },
+                                        child: const Text('Yes'),
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  OxygenReading(
+                                                camera: widget.camera,
+                                              ),
                                             ),
-                                          ),
-                                        ).then((value) {
-                                          setState(() {
-                                            result = value;
+                                          ).then((value) {
+                                            setState(() {
+                                              result = value;
+                                            });
                                           });
-                                        });
-                                      },
-                                      child: const Text("No"),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                        },
+                                        child: const Text("No"),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -158,67 +162,70 @@ class ReaderState extends State<Reader> {
                         ),
                         elevation: 5,
                         backgroundColor: Colors.indigo[50],
-                        child: SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.30,
-                          width: MediaQuery.of(context).size.width - 10,
-                          child: Center(
-                            child: Column(
-                              children: [
-                                const Text(
-                                  'Do you have Health Connect Device?',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
+                        child: Center(
+                          child: SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.30,
+                            width: MediaQuery.of(context).size.width - 10,
+                            child: Center(
+                              child: Column(
+                                children: [
+                                  const Text(
+                                    'Do you have Health Connect Device?',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
-                                ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(builder: (context) {
-                                            return ParameterReader(
-                                              communication: communication,
-                                              bluetoothMessage: "Heart Rate",
-                                              title: "Heart Rate Reading",
-                                              sensorWaitingTime: 65,
-                                            );
-                                          }),
-                                        ).then((value) {
-                                          setState(() {
-                                            result = value;
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) {
+                                              return ParameterReader(
+                                                communication: communication,
+                                                bluetoothMessage: "Heart Rate",
+                                                title: "Heart Rate Reading",
+                                                sensorWaitingTime: 75,
+                                              );
+                                            }),
+                                          ).then((value) {
+                                            setState(() {
+                                              result = value;
+                                            });
                                           });
-                                        });
-                                      },
-                                      child: const Text('Yes'),
-                                    ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                HeartRateCalculator(
-                                              camera: widget.camera,
+                                        },
+                                        child: const Text('Yes'),
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  HeartRateCalculator(
+                                                camera: widget.camera,
+                                              ),
                                             ),
-                                          ),
-                                        ).then((value) {
-                                          setState(() {
-                                            result = value;
+                                          ).then((value) {
+                                            setState(() {
+                                              result = value;
+                                            });
                                           });
-                                        });
-                                      },
-                                      child: const Text("No"),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                        },
+                                        child: const Text("No"),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -243,11 +250,13 @@ class ReaderState extends State<Reader> {
                       communication: communication,
                       bluetoothMessage: "Temperature",
                       title: "Temperature Reading",
-                      sensorWaitingTime: 125,
+                      sensorWaitingTime: 135,
                     );
                   }),
                 ).then((value) {
-                  result = value;
+                  setState(() {
+                    result = value;
+                  });
                 });
               },
               child: const Text(
@@ -266,11 +275,13 @@ class ReaderState extends State<Reader> {
                       communication: communication,
                       bluetoothMessage: "Blood Pressure",
                       title: "Blood Pressure Reading",
-                      sensorWaitingTime: 30,
+                      sensorWaitingTime: 45,
                     );
                   }),
                 ).then((value) {
-                  result = value;
+                  setState(() {
+                    result = value;
+                  });
                 });
               },
               child: const Text(
