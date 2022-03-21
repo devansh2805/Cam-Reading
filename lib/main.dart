@@ -1,8 +1,10 @@
 import 'dart:ui';
-import 'package:cam_reading/heartratereading.dart';
+import 'package:cam_reading/heartrate.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'oxygenreading.dart';
+import 'communication.dart';
+import 'parameterreader.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +29,7 @@ class Reader extends StatefulWidget {
 }
 
 class ReaderState extends State<Reader> {
+  Communication communication = Communication();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,43 +62,56 @@ class ReaderState extends State<Reader> {
                         child: SizedBox(
                           height: MediaQuery.of(context).size.height * 0.30,
                           width: MediaQuery.of(context).size.width - 10,
-                          child: Column(
-                            children: [
-                              const Text('Do you have Health Connect Device?'),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const OxygenReadingDevice(),
-                                        ),
-                                      );
-                                    },
-                                    child: const Text('Yes'),
+                          child: Center(
+                            child: Column(
+                              children: [
+                                const Text(
+                                  'Do you have Health Connect Device?',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
                                   ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => OxygenReading(
-                                            camera: widget.camera,
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(builder: (context) {
+                                            return ParameterReader(
+                                              communication: communication,
+                                              bluetoothMessage: "Oxygen",
+                                              title: "Oxygen Reading",
+                                              sensorWaitingTime: 65,
+                                            );
+                                          }),
+                                        );
+                                      },
+                                      child: const Text('Yes'),
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => OxygenReading(
+                                              camera: widget.camera,
+                                            ),
                                           ),
-                                        ),
-                                      );
-                                    },
-                                    child: const Text("No"),
-                                  ),
-                                ],
-                              ),
-                            ],
+                                        );
+                                      },
+                                      child: const Text("No"),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -112,19 +128,129 @@ class ReaderState extends State<Reader> {
             ),
             TextButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => HeartRateReading(
-                      camera: widget.camera,
-                    ),
-                  ),
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return BackdropFilter(
+                      filter: ImageFilter.blur(
+                        sigmaX: 10.0,
+                        sigmaY: 10.0,
+                      ),
+                      child: Dialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            20,
+                          ),
+                        ),
+                        elevation: 5,
+                        backgroundColor: Colors.indigo[50],
+                        child: SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.30,
+                          width: MediaQuery.of(context).size.width - 10,
+                          child: Center(
+                            child: Column(
+                              children: [
+                                const Text(
+                                  'Do you have Health Connect Device?',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(builder: (context) {
+                                            return ParameterReader(
+                                              communication: communication,
+                                              bluetoothMessage: "Heart Rate",
+                                              title: "Heart Rate Reading",
+                                              sensorWaitingTime: 65,
+                                            );
+                                          }),
+                                        );
+                                      },
+                                      child: const Text('Yes'),
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                HeartRateCalculator(
+                                              camera: widget.camera,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: const Text("No"),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 );
               },
               child: const Text(
                 "Read Heart Rate",
               ),
-            )
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) {
+                    return ParameterReader(
+                      communication: communication,
+                      bluetoothMessage: "Temperature",
+                      title: "Temperature Reading",
+                      sensorWaitingTime: 125,
+                    );
+                  }),
+                );
+              },
+              child: const Text(
+                "Read Temperature",
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) {
+                    return ParameterReader(
+                      communication: communication,
+                      bluetoothMessage: "Blood Pressure",
+                      title: "Blood Pressure Reading",
+                      sensorWaitingTime: 30,
+                    );
+                  }),
+                );
+              },
+              child: const Text(
+                "Read Blood Pressure",
+              ),
+            ),
           ],
         ),
       ),

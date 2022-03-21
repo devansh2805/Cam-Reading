@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:export_video_frame/export_video_frame.dart';
 import 'package:image/image.dart' as img;
 import 'package:stats/stats.dart';
-import 'waitmeasuring.dart';
 import 'communication.dart';
 
 class OxygenReading extends StatefulWidget {
@@ -49,11 +48,86 @@ class OxygenReadingState extends State<OxygenReading> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Blood Oxygen Saturation')),
+      backgroundColor: const Color(0xFFffffff),
       body: FutureBuilder<void>(
         future: _initializeControllerFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            return CameraPreview(_cameraController);
+            if (_recordingOn) {
+              return SafeArea(
+                child: Container(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Center(
+                        child: Text(
+                          "Measuring SpO2.....",
+                          style: TextStyle(
+                            color: Colors.blue,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Center(
+                        child: Text(
+                          "Keep Finger on Camera and Torch",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w300,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            } else {
+              return SafeArea(
+                child: Container(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 10),
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(12, 8, 12, 8),
+                        child: Text(
+                          'Ensure that you place finger on torch and camera before starting.',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        "Sp02: " + _spo2.toString(),
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      CameraPreview(_cameraController)
+                    ],
+                  ),
+                ),
+              );
+            }
           } else {
             return const Center(child: CircularProgressIndicator());
           }
@@ -79,8 +153,8 @@ class OxygenReadingState extends State<OxygenReading> {
                       setState(() {
                         _recordingOn = true;
                       });
-                      BuildContext dialogContext = context;
-                      showDialog(
+                      // BuildContext dialogContext = context;
+                      /*showDialog(
                         context: context,
                         builder: (context) {
                           dialogContext = context;
@@ -88,7 +162,7 @@ class OxygenReadingState extends State<OxygenReading> {
                             nameString: 'SpO2',
                           );
                         },
-                      );
+                      );*/
                       Future.delayed(
                         const Duration(
                           seconds: 20,
@@ -101,7 +175,7 @@ class OxygenReadingState extends State<OxygenReading> {
                                     .setFlashMode(FlashMode.off)
                                     .then((value) {
                                   setState(() {
-                                    Navigator.pop(dialogContext);
+                                    // Navigator.pop(dialogContext);
                                     _recordingOn = false;
                                   });
                                 });
@@ -158,148 +232,7 @@ class OxygenReadingState extends State<OxygenReading> {
     num sdr = redStats.standardDeviation;
     num sdb = blueStats.standardDeviation;
     setState(() {
-      _spo2 = 100 - 5 * ((sdr / mr) / (sdb / mb));
+      _spo2 = (99 - 5 * ((sdr / mr) / (sdb / mb))).round();
     });
-  }
-}
-
-class OxygenReadingDevice extends StatefulWidget {
-  const OxygenReadingDevice({Key? key}) : super(key: key);
-
-  @override
-  State<OxygenReadingDevice> createState() => OxygenReadingDeviceState();
-}
-
-class OxygenReadingDeviceState extends State<OxygenReadingDevice> {
-  Communication communication = Communication();
-  String reading = "";
-  //late Future<bool> connectionState;
-
-  @override
-  void initState() {
-    super.initState();
-    //connectionState = communication.initialize();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Oxygen Reading"),
-      ),
-      body: Center(
-          child: TextButton(
-        child: const Text("Start Reading"),
-        onPressed: () async {
-          await communication.initialize();
-          if (communication.bluetoothConnection.isConnected) {
-            await communication.sendMessage("Oxygen");
-            // Show Some Temporary Screen Instructing User to use sensor
-            await communication.readMessage().then((value) {
-              print(value);
-              Navigator.pop(context);
-            });
-          } else {
-            showDialog(
-              context: context,
-              useRootNavigator: false,
-              builder: (context) {
-                return BackdropFilter(
-                  filter: ImageFilter.blur(
-                    sigmaX: 10.0,
-                    sigmaY: 10.0,
-                  ),
-                  child: Dialog(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        20,
-                      ),
-                    ),
-                    elevation: 5,
-                    backgroundColor: Colors.indigo[50],
-                    child: SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.30,
-                      width: MediaQuery.of(context).size.width - 10,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text("Error Connecting Device"),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: const Text("Retry"),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-            );
-          }
-        },
-      )),
-    );
-    //   return FutureBuilder(
-    //     future: communication.initialize(),
-    //     builder: (context, snapshot) {
-    //       if (snapshot.connectionState == ConnectionState.done) {
-    //         communication.sendMessage("Read SpO2");
-    //         return FutureBuilder(
-    //           future: communication.readMessage(),
-    //           builder: (context, messagesnapshot) {
-    //             if (messagesnapshot.connectionState == ConnectionState.done) {
-    //               // Navigate Back with Data
-    //               return Text(snapshot.data.toString());
-    //             } else {
-    //               return Scaffold(
-    //                 body: Center(
-    //                   child: Column(
-    //                     children: const [
-    //                       CircularProgressIndicator(),
-    //                       SizedBox(
-    //                         height: 20,
-    //                       ),
-    //                       Text(
-    //                         'Reading Spo2...Keep Index Finger on Device',
-    //                         style: TextStyle(
-    //                           color: Colors.black,
-    //                           fontSize: 24,
-    //                         ),
-    //                       )
-    //                     ],
-    //                   ),
-    //                 ),
-    //               );
-    //             }
-    //           },
-    //         );
-    //       } else {
-    //         return Scaffold(
-    //           body: Center(
-    //             child: Column(
-    //               children: const [
-    //                 CircularProgressIndicator(),
-    //                 SizedBox(
-    //                   height: 20,
-    //                 ),
-    //                 Text(
-    //                   'Connecting to HealthConnect Device',
-    //                   style: TextStyle(
-    //                     color: Colors.black,
-    //                     fontSize: 24,
-    //                   ),
-    //                 )
-    //               ],
-    //             ),
-    //           ),
-    //         );
-    //       }
-    //     },
-    //   );
   }
 }

@@ -99,19 +99,15 @@ class Communication {
 
   Future<String> readMessage() async {
     String result = "";
-    await Future.delayed(const Duration(seconds: 70), () {
       try {
         bluetoothConnection.input?.listen((data) {
           result = ascii.decode(data);
-          print(result);
-        }).onDone(() {});
+        });
         return result;
       } catch (error) {
         print(error);
       }
       return result;
-    });
-    return result;
   }
 
   Future<void> sendMessage(String text) async {
