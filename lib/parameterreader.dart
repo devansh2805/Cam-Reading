@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'communication.dart';
 import 'dart:ui';
 import 'dart:convert';
+import 'globals.dart' as globals;
 
 class ParameterReader extends StatefulWidget {
   const ParameterReader(
@@ -67,54 +68,16 @@ class ParameterReaderState extends State<ParameterReader> {
                       });
                       await widget.communication
                           .sendMessage(widget.bluetoothMessage);
-                      // Show Some Temporary Screen Instructing User to use sensor
-                      Future.delayed(
-                        Duration(seconds: widget.sensorWaitingTime),
-                        () async {
-                          setState(() {
-                            _loading = false;
-                          });
-                          widget.communication.bluetoothConnection?.input
-                              ?.listen((data) {
-                            String value = ascii.decode(data);
-                            print(value);
-                            switch (widget.bluetoothMessage) {
-                              case "Oxygen":
-                                {
-                                  Navigator.pop(
-                                    context,
-                                    value + " %",
-                                  );
-                                  break;
-                                }
-                              case "Heart Rate":
-                                {
-                                  Navigator.pop(
-                                    context,
-                                    value + " bpm",
-                                  );
-                                  break;
-                                }
-                              case "Temperature":
-                                {
-                                  Navigator.pop(
-                                    context,
-                                    value + " °F",
-                                  );
-                                  break;
-                                }
-                              case "Blood Pressure":
-                                {
-                                  Navigator.pop(
-                                    context,
-                                    value,
-                                  );
-                                  break;
-                                }
-                            }
-                          });
-                        },
-                      );
+                      widget.communication.dataSubscription.onData((data) {
+                        setState(() {
+                          _loading = false;
+                        });
+                        String value = ascii.decode(data);
+                        Navigator.pop(
+                          context,
+                          value,
+                        );
+                      });
                     } else {
                       showDialog(
                         context: context,
